@@ -1,0 +1,153 @@
+﻿@using SakashimaSystem.Models.Kpt
+@model KptListModel
+@{
+    ViewData["Title"] = Model.InputTitle + "一覧画面";
+    Layout = "_Layout_MarkerPen";
+}
+@section TitleLink {
+    <a class="navbar-brand" href="/Login/index/@Model.BoardId"><img style="width:150px;" src="/lib/rogo.png"></a>
+}
+<style>
+    body {
+        margin: 20px;
+    }
+
+    .item_v3 {
+        padding: 10px;
+        width: 300px;
+        height: 100px;
+        border: 1px solid #2e6da4;
+        background-color: #7da8c3;
+        color: #FFFFFF;
+    }
+
+        .item_v3:hover {
+            cursor: pointer;
+        }
+
+        .item_v3 p {
+            display: inline-block;
+            margin: 0px;
+        }
+
+    .ui-selected {
+        background-color: #1cc7ff;
+    }
+
+    .ui-selectable-helper {
+        position: absolute;
+        z-index: 100;
+        border: 1px dotted black;
+    }
+
+    .item_label {
+        width: 250px;
+        height: 30px;
+        border: 1px solid #2e6da4;
+        background-color: #66CC99;
+        color: #FFFFFF;
+    }
+
+    .item_tag {
+        width: 250px;
+        background-color: #b3cc66;
+        color: #1b0ce0;
+    }
+
+    .item_label:hover {
+        cursor: pointer;
+    }
+
+    .item_label p {
+        display: inline-block;
+    }
+
+    .item_inner_label {
+        width: 85%;
+        color: #FF0000;
+    }
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 ">
+    <div class="col-md-12 col-12">
+        <div class="text-left">
+            <h4>@Html.DisplayTextFor(x => x.InputTitle) 一覧画面</h4>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 ">
+    <div class="col-md-10 col-10" id="container_v3">
+        <button id="add_tag_btn" type="button">タグ追加ボタン</button>
+        <div class="item_area_v3">
+            @foreach (var item in Model.KptList)
+            {
+                <div class="item_v3">
+                    @item.Title<br />
+                    @item.Comment<br />
+                    @item.UserName
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script>
+    $(function setup() {
+        $('.item_area_v3').selectable({
+            cancel: "p",
+            selected: function (e, ui) {
+                $(ui.selected).draggable().draggable('enable');
+            }
+        });
+        $('.item_v3').draggable({
+            snap: true,
+            drag: function (e, ui) {
+                $('.ui-selected').each(function () {
+                    $(this).css({
+                        top: ui.position.top,
+                        left: ui.position.left
+                    });
+                });
+            },
+            stop: function (e, ui) {
+                $('.ui-selected').each(function () {
+                    $(this).selectable().selectable('destroy');
+                    $(this).draggable().draggable('disable');
+                });
+            }
+        }).draggable('disable');
+
+        $('.item_label').draggable({
+            snap: true,
+            drag: function (e, ui) {
+                $('.ui-selected').each(function () {
+                    $(this).css({
+                        top: ui.position.top,
+                        left: ui.position.left
+                    });
+                });
+            },
+            stop: function (e, ui) {
+                $('.ui-selected').each(function () {
+                    $(this).selectable().selectable('destroy');
+                    $(this).draggable().draggable('disable');
+                });
+            }
+        }).draggable('disable');
+
+
+        // タグ入力の input タグをアクティブにする
+        $(document).on("dblclick", ".item_tag", function () {
+            $(this).find("input").focus();
+        });
+
+        // タグ追加ボタンの処理
+        $('#add_tag_btn').on('click', function () {
+            // 所定の要素に新たな要素とテキストを追加する
+            $('.item_area_v3').prepend('<div class="item_tag"><input class="item_inner_label" type="text" /></div>');
+        });
+    });
+</script>

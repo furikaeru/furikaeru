@@ -1,0 +1,23 @@
+﻿@using SakashimaSystem.Models.Login
+@model LoginViewModel
+@{
+    ViewData["Title"] = "ようこそ！フリカエルへ！";
+}
+@section TitleLink {
+    <a class="navbar-brand" href="/"><img style="width:150px;"src="/lib/rogo.png"></a>
+}
+<div class="login-signin">
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="text-center">
+            <h2>ようこそ！フリカエルへ！</h2>
+        </div>
+        <div style="text-align:center; margin:20px;">
+            <img src="lib/rogo.png">
+        </div>
+        <div class="text-center">
+            <button type="submit" formaction="@Url.Action("CreateBoard")" class="btn btn-lg btn-primary" style="width: 250px;">KPTボードを作成する</button>
+        </div>
+    </form>
+</div>

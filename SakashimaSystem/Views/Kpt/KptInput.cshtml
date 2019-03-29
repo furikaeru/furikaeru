@@ -1,0 +1,140 @@
+﻿@using SakashimaSystem.Models.Kpt
+@model KptListModel
+@{
+    ViewData["Title"] = Model.InputTitle + "入力画面";
+
+    var i = 0;
+    var listConunt = 0;
+}
+@section TitleLink {
+    <a class="navbar-brand" href="/Login/index/@Model.BoardId"><img style="width:150px;" src="/lib/rogo.png"></a>
+}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 ">
+    <div class="col-md-12 col-12">
+        <div class="text-left">
+            <h4>@Html.DisplayTextFor(x => x.InputTitle) 入力画面</h4>
+        </div>
+    </div>
+</div>
+
+<form name="kptForm" method="post">
+    @Html.AntiForgeryToken()
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 ">
+        <div class="col-md-5 col-5">
+            <div class="login-textbox">
+                @Html.TextBoxFor(x => x.Title, new { @class = "form-control", placeholder = "タイトル" })
+                @Html.ValidationMessageFor(x => x.Title, null, new { style = "color:red;" })
+            </div>
+        </div>
+        <div class="col-md-6 col-6">
+            <div class="login-textbox">
+                @Html.TextBoxFor(x => x.Comment, new { @class = "form-control", placeholder = "コメント" })
+                @Html.ValidationMessageFor(x => x.Comment, null, new { style = "color:red;" })
+            </div>
+        </div>
+        <div class="col-md-1 col-1">
+            <div class="text-right">
+                <input type="submit" name="inputitem" value="＋" class="btn btn-default rounded-circle p-0" />
+                <!--<button type="submit"  name ="inputitem" class="btn btn-default rounded-circle p-0">＋</button>-->
+                <!--<button class="btn btn-default rounded-circle p-0" style="width:3rem;height:3rem;" onclick="addRow(this);">＋</button>-->
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 ">
+        <div class="col-md-12 col-12">
+            <div class="table-responsive">
+                <!--
+                <div class="text-right">
+                    <button class="btn btn-default rounded-circle p-0" style="width:3rem;height:3rem;" onclick="addRow(this);">＋</button>
+                </div>-->
+                <table class="table table-striped table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-2">タイトル</th>
+                            <th class="col-xs-2">コメント</th>
+                            <th class="col-xs-2">編集</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.KptList)
+                        {
+                            <tr class="@(item.IsEditing ? "editing" : string.Empty)">
+                                <td>
+                                    <span style="@(item.IsEditing ? "display:none;" : string.Empty)" class="align-middle @(item.IsCurrent ? "text-success font-weight-bold" : string.Empty)">@item.Title</span>
+                                    <input style="@(!item.IsEditing ? "display:none;" : string.Empty)" type="text" value="@item.Title" placeholder="" />
+                                </td>
+                                <td>
+                                    <span style="@(item.IsEditing ? "display:none;" : string.Empty)" class="align-middle @(item.IsCurrent ? "text-success font-weight-bold" : string.Empty)">@item.Comment</span>
+                                    <input style="@(!item.IsEditing ? "display:none;" : string.Empty)" type="text" value="@item.Title" placeholder="" />
+                                </td>
+                                <td>
+                                    <div class="btn-group-2">
+                                        <button type="button" class="btn btn-default" onclick="deleteItem(@listConunt)">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            listConunt += 1;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="col-md-12 col-12 text-right">
+            <input type="submit" name="commitItem" value="確定" class="btn tap  btn-primary btn--size-m" />
+        </div>
+    </div>
+
+    <div>
+        @if (Model.InputType == SakashimaSystem.Entities.Kpt.KptType.Problem)
+        {
+            <div class="col-md-12 col-12">
+                <a href="/Kpt/Index?boardId=@Model.BoardId&type=0" target="_blank"><input type="button" name="keeplist" value="Keep一覧を見る" class="btn tap  btn--c-action btn--size-m" /></a>
+            </div>
+        }
+        else if (Model.InputType == SakashimaSystem.Entities.Kpt.KptType.Try)
+        {
+            <div class="col-md-12 col-12">
+                <a href="/Kpt/Index?boardId=@Model.BoardId&type=1" target="_blank"><input type="button" name="problemlist" value="Problem一覧を見る" class="btn tap  btn--c-action btn--size-m" /></a>
+            </div>
+        }
+    </div>
+    @foreach (var item in Model.KptList)
+    {
+        <input type="hidden" id="kpt[@i].Title" name="kpt[@i].Title" value="@item.Title" />
+        <input type="hidden" id="kpt[@i].Comment" name="kpt[@i].Comment" value="@item.Comment" />
+        <input type="hidden" id="kpt[@i].Type" name="kpt[@i].Type" value="@item.Type" />
+        <input type="hidden" id="kpt[@i].UserName" name="kpt[@i].UserName" value="@item.UserName" />
+        i += 1;
+    }
+    @Html.HiddenFor(x => x.InputTitle)
+    @Html.HiddenFor(x => x.InputNextType)
+    @Html.HiddenFor(x => x.InputType)
+    @Html.HiddenFor(x => x.IsDeleteMode)
+    @Html.HiddenFor(x => x.DeleteItemIndex)
+    @Html.HiddenFor(x => x.BoardId)
+</form>
+<table id="table-template" style="display:none;">
+    <tbody>
+        <tr>
+            <td>
+                <span class="align-middle"></span>
+                <input type="text" placeholder="" />
+            </td>
+            <td>
+                <span class="align-middle"></span>
+                <input type="text" placeholder="" />
+            </td>
+            <td>
+                <div class="btn-group-2">
+                    <button type="button" class="btn btn-default" disabled="disabled">削除</button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
